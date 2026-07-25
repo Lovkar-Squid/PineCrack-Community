@@ -38,7 +38,44 @@ from pinecrack import (
 )
 
 APP_NAME = "PineCrack"
-APP_VERSION = "2.2"
+APP_VERSION = "2.3"
+
+# --- self-update ------------------------------------------------------------
+# Community edition checks the public GitHub releases. To point at your own
+# server instead, set PINECRACK_UPDATE_URL to a JSON manifest:
+#   {"version": "2.3", "url": "<installer .exe URL>", "notes": "..."}
+UPDATE_GITHUB_REPO = "Lovkar-Squid/PineCrack-Community"
+UPDATE_MANIFEST_URL = os.environ.get("PINECRACK_UPDATE_URL", "")
+
+
+def _pc_ver_tuple(s):
+    out = []
+    for part in str(s).lstrip("vV").split("."):
+        digits = "".join(c for c in part if c.isdigit())
+        out.append(int(digits) if digits else 0)
+    return tuple(out) if out else (0,)
+
+
+def pc_fetch_latest():
+    """Return (version, download_url, notes); raises on network error."""
+    import urllib.request
+
+    def _get(url):
+        req = urllib.request.Request(url, headers={"User-Agent": "PineCrack-Updater"})
+        with urllib.request.urlopen(req, timeout=12) as r:
+            return json.loads(r.read().decode("utf-8", "replace"))
+
+    if UPDATE_MANIFEST_URL:
+        j = _get(UPDATE_MANIFEST_URL)
+        return str(j.get("version", "")).lstrip("vV"), j.get("url", ""), j.get("notes", "")
+    j = _get("https://api.github.com/repos/%s/releases/latest" % UPDATE_GITHUB_REPO)
+    ver = str(j.get("tag_name", "")).lstrip("vV")
+    url = ""
+    for a in j.get("assets", []):
+        if str(a.get("name", "")).lower().endswith(".exe"):
+            url = a.get("browser_download_url", "")
+            break
+    return ver, url, j.get("body", "")
 
 # ---- palette -------------------------------------------------------------
 BG      = "#0b0f17"
@@ -284,6 +321,51 @@ class PineCrack2(ctk.CTk):
                      text_color=MUTE).pack(anchor="w", padx=12, pady=(8, 0))
         ctk.CTkLabel(badge, text=gpu, font=ctk.CTkFont(size=12), text_color=OK,
                      wraplength=160, justify="left").pack(anchor="w", padx=12, pady=(0, 8))
+        upd = ctk.CTkButton(bar, text="⟳  Check for updates", anchor="w",
+                            font=ctk.CTkFont(size=12), height=34, corner_radius=10,
+                            fg_color="transparent", hover_color=CARD2, text_color=MUTE,
+                            command=self._check_updates)
+        upd.pack(side="bottom", fill="x", padx=12, pady=(0, 2))
+        self.after(2500, lambda: self._check_updates(silent=True))  # quiet check on launch
+
+    def _check_updates(self, silent=False):
+        def work():
+            try:
+                ver, url, notes = pc_fetch_latest()
+            except Exception as e:
+                if not silent:
+                    self.after(0, lambda: messagebox.showerror(
+                        "Check for updates", "Could not check for updates:\n%s" % e))
+                return
+            if not ver or _pc_ver_tuple(ver) <= _pc_ver_tuple(APP_VERSION):
+                if not silent:
+                    self.after(0, lambda: messagebox.showinfo(
+                        "Check for updates", "You're on the latest version (v%s)." % APP_VERSION))
+                return
+            self.after(0, lambda: self._offer_update(ver, url, notes))
+        threading.Thread(target=work, daemon=True).start()
+
+    def _offer_update(self, ver, url, notes):
+        msg = "PineCrack v%s is available (you have v%s)." % (ver, APP_VERSION)
+        if notes:
+            msg += "\n\nWhat's new:\n%s" % str(notes)[:400]
+        if not url:
+            messagebox.showinfo("Update available", msg + "\n\n(No installer link found in the release.)")
+            return
+        if not messagebox.askyesno("Update available", msg + "\n\nDownload and install now?"):
+            return
+
+        def dl():
+            try:
+                import urllib.request, tempfile
+                dst = os.path.join(tempfile.gettempdir(), "PineCrack-Setup-%s.exe" % ver)
+                urllib.request.urlretrieve(url, dst)
+                self.after(0, lambda: (os.startfile(dst), self.destroy()))
+            except Exception as e:
+                self.after(0, lambda: messagebox.showerror("Update", "Download failed:\n%s" % e))
+        threading.Thread(target=dl, daemon=True).start()
+        messagebox.showinfo("Downloading",
+                            "Downloading v%s in the background…\nThe installer will open when it's ready." % ver)
 
     def _show(self, name):
         self.views[name].tkraise()

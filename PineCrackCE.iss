@@ -3,7 +3,7 @@
 ; Requires PineCrack.exe next to this script (build it first: build_exe.bat)
 
 #define AppName "PineCrack Community"
-#define AppVer "2.2"
+#define AppVer "2.3"
 #define AppExe "PineCrack.exe"
 
 [Setup]

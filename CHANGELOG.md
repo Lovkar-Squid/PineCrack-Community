@@ -2,6 +2,14 @@
 
 All notable changes to the Community edition. Dates are release dates.
 
+## v2.3 — 2026-07-25
+
+**Added**
+- ⟳ **In-app updater** — a **"Check for updates"** button in the sidebar checks GitHub for a
+  newer release; if one exists it downloads the installer and launches it for you. It also runs
+  a quiet check on launch and only prompts when an update is actually available. Point it at your
+  own server instead by setting the `PINECRACK_UPDATE_URL` environment variable to a JSON manifest.
+
 ## v2.2 — 2026-07-25
 
 The first big update since the public release. The `.exe`/installer are now essentially
