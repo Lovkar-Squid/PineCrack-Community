@@ -1,0 +1,38 @@
+# build artifacts
+build/
+dist/
+*.spec
+__pycache__/
+*.pyc
+
+# runtime user data
+pinecrack.potfile
+cracked.txt
+pinecrack_history.jsonl
+*.bak
+
+# built binaries — publish these under GitHub Releases, not in the tree
+/PineCrack.exe
+/PineCrack2.exe
+/PineCrack-Setup.exe
+/PineCrack-Community-Setup.exe
+/UnRAR.exe
+
+# stray logs
+rel.err
+rel.log
+*.log
+
+
+# bundled third-party tools (213 MB, shipped inside the exe/installer, not git)
+tools/
+
+
+# PyInstaller build artifacts
+build/
+dist/
+__pycache__/
+*.spec
+_b.out
+_b.err
+
