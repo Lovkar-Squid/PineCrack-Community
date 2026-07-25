@@ -1,9 +1,10 @@
-# PineCrack - install Strawberry Perl (needed for John's *2john ".pl" hash extractors,
+﻿# PineCrack - install Strawberry Perl (needed for John's *2john ".pl" hash extractors,
 # e.g. 7z2john.pl). Downloads the official portable build and writes perl_path into the config.
 # The installer runs this as Administrator. Re-run any time:
 #     powershell -ExecutionPolicy Bypass -File install-perl.ps1
 param([switch]$NoPause)
 $ErrorActionPreference = "Continue"
+$ProgressPreference = 'SilentlyContinue'   # ~100x faster Invoke-WebRequest (progress bar is the bottleneck)
 try { $OutputEncoding = New-Object System.Text.UTF8Encoding $false } catch {}
 [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12
 

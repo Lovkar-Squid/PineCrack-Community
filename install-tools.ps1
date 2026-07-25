@@ -1,4 +1,4 @@
-# PineCrack - download + install the cracking engine (hashcat, and aircrack-ng).
+﻿# PineCrack - download + install the cracking engine (hashcat, and aircrack-ng).
 # Downloads from the OFFICIAL sites (hashcat.net / aircrack-ng.org). An OPTIONAL private
 # fallback (e.g. your own server) can be enabled by setting the PINECRACK_TOOLS_URL
 # environment variable to a .rar of the tools — it is NOT stored in this repo.
@@ -11,6 +11,7 @@ param(
     [switch]$NoPause
 )
 $ErrorActionPreference = "Continue"
+$ProgressPreference = 'SilentlyContinue'   # ~100x faster Invoke-WebRequest (progress bar is the bottleneck)
 try { $OutputEncoding = New-Object System.Text.UTF8Encoding $false } catch {}
 [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12
 $here     = Split-Path -Parent $MyInvocation.MyCommand.Path
