@@ -13,6 +13,14 @@ wordlist and go — with live speed/ETA, an auto-crack pipeline, a job queue, cr
 
 ---
 
+## 💬 Community & support
+
+Get help, report bugs, and hear about new releases on our Discord:
+
+**➡️ https://discord.gg/bfS674hZ**
+
+---
+
 ## ✨ Features
 
 - **Dashboard** with live stat cards (speed / progress / ETA / recovered / GPU temp) and a live speed graph
