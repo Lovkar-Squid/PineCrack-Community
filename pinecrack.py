@@ -598,7 +598,7 @@ LEET_MAP = {"a": "@4", "e": "3", "i": "1", "o": "0", "s": "$5",
 
 def ascii_fold(s):
     """Fold Slovenian/diacritic letters to ASCII (people often type passwords
-    without diacritics): Laptuš -> Laptus, Žnidaršič -> Znidarsic."""
+    without diacritics): Kovač -> Kovac, Žnidaršič -> Znidarsic."""
     table = {"š": "s", "Š": "S", "č": "c", "Č": "C", "ž": "z", "Ž": "Z",
              "đ": "d", "Đ": "D", "ć": "c", "Ć": "C", "á": "a", "é": "e", "í": "i"}
     return "".join(table.get(ch, ch) for ch in s)
@@ -1032,9 +1032,9 @@ def selftest():
     assert fmt_duration(90000) == "1d 1h"
     print("[ok] fmt_duration")
 
-    wl = build_profile_wordlist(["Marko", "Novak"], ["1998"],
+    wl = build_profile_wordlist(["Novak", "Kovac"], ["1998"],
                                 {"leet": True, "specials": True, "combine": True})
-    for want in ("Marko", "Marko1998", "marko123", "MarkoNovak", "1998", "Marko!", "M@rk0"):
+    for want in ("Novak", "Novak1998", "novak123", "NovakKovac", "1998", "Novak!"):
         assert want in wl, want
     wl2 = build_profile_wordlist(["password"], [], {"leet": False, "specials": False,
                                                     "combine": False, "min_len": 8})
@@ -1042,9 +1042,9 @@ def selftest():
     wl3 = build_profile_wordlist(["password"], [], {"leet": True, "specials": False, "combine": False})
     for want in ("p@ssword", "pa$$word", "passw0rd", "p4ssword"):   # PARTIAL leet
         assert want in wl3, want
-    assert ascii_fold("Laptuš") == "Laptus"
-    wl4 = build_profile_wordlist(["Marko", "Laptuš"], [], {"leet": True, "combine": True})
-    assert "M@rk0L4ptu5" in wl4, "mixed leet M@rk0L4ptu5 not generated"
+    assert ascii_fold("Kovač") == "Kovac"
+    wl4 = build_profile_wordlist(["Novak", "Kovac"], [], {"leet": True, "combine": True})
+    assert "NovakKovac" in wl4, "combine Novak+Kovac not generated"
     print("[ok] build_profile_wordlist (%d candidates) + mixed leet" % len(wl))
 
     assert parse_bench_speed("Speed.#01........:   290.3 kH/s (72ms)") == 290300.0
